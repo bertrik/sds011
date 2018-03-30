@@ -20,13 +20,13 @@ static bool test_rx(void)
         // header, cmd
         0xAA, 0xC0,
         // PM2.5
-        0x25, 0x00,
+        0xD4, 0x04,
         // PM10
-        0x00, 0x01,
+        0x3A, 0x0A,
         // ID
-        0x34, 0x12,
+        0xA1, 0x60,
         // checksum
-        0x00,
+        0x1D,
         // tail
         0xAB
     };
@@ -45,9 +45,9 @@ static bool test_rx(void)
     // parse
     sds_meas_t meas;
     SdsParse(&meas);
-    ok = assertEquals(0x0025, meas.pm2_5, "PM2.5");
-    ok = ok && assertEquals(0x0100, meas.pm10, "PM10");
-    ok = ok && assertEquals(0x1234, meas.id, "ID");
+    ok = assertEquals(1236, meas.pm2_5, "PM2.5");
+    ok = ok && assertEquals(2618, meas.pm10, "PM10");
+    ok = ok && assertEquals(0x60A1, meas.id, "ID");
 
     return ok;    
 }
