@@ -22,7 +22,7 @@ typedef struct {
     uint8_t buf[32];
     int     size;
     int     idx, len;
-    uint16_t chk, sum;
+    uint8_t sum, chk;
 } TState;
 
 static TState state;
@@ -48,14 +48,13 @@ bool SdsProcess(uint8_t b)
     switch (state.state) {
     // wait for HEAD byte
     case HEAD:
-        state.sum = b;
         if (b == MAGIC1) {
             state.state = COMMAND;
         }
         break;
-    // wait for BEGIN2 byte
+    // receive COMMAND byte
     case COMMAND:
-        state.sum += b;
+        state.sum = 0;
         state.cmd = b;
         state.idx = 0;
         state.len = 6;
@@ -74,7 +73,12 @@ bool SdsProcess(uint8_t b)
     // store checksum
     case CHECK:
         state.chk = b;
-        state.state = TAIL;
+        if (b == state.sum) {
+            state.state = TAIL;
+        } else {
+            state.state = HEAD;
+            SdsProcess(b);
+        }
         break;
     case TAIL:
         state.state = HEAD;
