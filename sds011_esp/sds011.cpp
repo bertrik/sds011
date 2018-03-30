@@ -45,8 +45,6 @@ void SdsInit(void)
  */
 bool SdsProcess(uint8_t b)
 {
-    printf("state=%d, b=%x, ", state.state, b);
-
     switch (state.state) {
     // wait for HEAD byte
     case HEAD:
@@ -59,16 +57,17 @@ bool SdsProcess(uint8_t b)
     case COMMAND:
         state.sum += b;
         state.cmd = b;
-        state.state = DATA;
-        state.len = 6;
         state.idx = 0;
+        state.len = 6;
+        state.state = DATA;
         break;
     // store data
     case DATA:
         state.sum += b;
         if (state.idx < state.len) {
             state.buf[state.idx++] = b;
-        } else {
+        }
+        if (state.idx == state.len) {
             state.state = CHECK;
         }
         break;
@@ -84,16 +83,15 @@ bool SdsProcess(uint8_t b)
         state.state = HEAD;
         break;
     }
-    printf("state=%d\n", state.state);
     return false;
 }
 
-static uint16_t get(uint8_t *buf, int idx)
+static uint16_t get(const uint8_t *buf, int idx)
 {
-    uint16_t data;
-    data = buf[idx] << 8;
-    data += buf[idx + 1];
-    return data;
+    uint16_t word;
+    word = buf[idx++];
+    word += buf[idx++] << 8;
+    return word;
 }
 
 /**
