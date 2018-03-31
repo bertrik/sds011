@@ -45,8 +45,8 @@ static bool test_rx(void)
     // parse
     sds_meas_t meas;
     SdsParse(&meas);
-    ok = assertEquals(1236, meas.pm2_5, "PM2.5");
-    ok = ok && assertEquals(2618, meas.pm10, "PM10");
+    ok = assertEquals(123, (int)meas.pm2_5, "PM2.5");
+    ok = ok && assertEquals(261, (int)meas.pm10, "PM10");
     ok = ok && assertEquals(0x60A1, meas.id, "ID");
 
     return ok;    

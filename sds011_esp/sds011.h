@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 typedef struct {
-    uint16_t pm2_5;
-    uint16_t pm10;
+    float pm2_5;
+    float pm10;
     uint16_t id;
 } sds_meas_t;
 

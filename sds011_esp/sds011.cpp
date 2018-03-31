@@ -104,8 +104,8 @@ static uint16_t get(const uint8_t *buf, int idx)
  */
 void SdsParse(sds_meas_t *meas)
 {
-    meas->pm2_5 = get(state.buf, 0);
-    meas->pm10 = get(state.buf, 2);
+    meas->pm2_5 = get(state.buf, 0) / 10.0;
+    meas->pm10 = get(state.buf, 2) / 10.0;
     meas->id = get(state.buf, 4);
 }
 
