@@ -52,27 +52,21 @@ static bool test_rx(void)
     return ok;    
 }
 
-#if 0
 static bool test_tx(void)
 {
     int res;
-    uint8_t txbuf[16];
+    uint8_t txbuf[32];
 
-    // verify too small buffer
-    res = SdsCreateCmd(txbuf, 6, 0xE0, 0);
-    if (res > 0) {
-        fprintf(stderr, "expected failure for too small buffer!");
-        return false;
-    }
+    // query data command
+    uint8_t cmd_data[15] = {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF};
 
     // verify valid message
-    res = SdsCreateCmd(txbuf, sizeof(txbuf), 0xE1, 0x1234);
-    assertEquals(7, res, "sizeof(txbuf)");
+    res = SdsCreateCmd(txbuf, sizeof(txbuf), 0xB4, cmd_data, sizeof(cmd_data));
+    assertEquals(19, res, "sizeof(txbuf)");
 
-    const uint8_t expected[] = {0x42, 0x4d, 0xE1, 0x12, 0x34, 0x01, 0xB6};
+    const uint8_t expected[] = {0xAA, 0xB4, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0x02, 0xAB};
     return (memcmp(expected, txbuf, sizeof(expected)) == 0);
 }
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -83,11 +77,9 @@ int main(int argc, char *argv[])
     printf("test_rx ...");
     b = test_rx();
     printf("%s\n", b ? "PASS" : "FAIL");
-#if 0
     printf("test_tx ...");
     b = test_tx();
     printf("%s\n", b ? "PASS" : "FAIL");
-#endif
     return 0;
 }
 
