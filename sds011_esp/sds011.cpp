@@ -22,7 +22,7 @@ typedef struct {
     uint8_t buf[32];
     int     size;
     int     idx, len;
-    uint8_t sum, chk;
+    uint8_t sum;
 } TState;
 
 static TState state;
@@ -35,7 +35,7 @@ void SdsInit(void)
     state.state = HEAD;
     state.size = sizeof(state.buf);
     state.idx = state.len = 0;
-    state.chk = state.sum = 0;
+    state.sum = 0;
 }
 
 /**
@@ -72,7 +72,6 @@ bool SdsProcess(uint8_t b)
         break;
     // store checksum
     case CHECK:
-        state.chk = b;
         if (b == state.sum) {
             state.state = TAIL;
         } else {
