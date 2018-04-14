@@ -1,9 +1,10 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "sds011.h"
 
-// magic header bytes
+// magic header/footer bytes
 #define MAGIC1 0xAA
 #define MAGIC2 0xAB
 
@@ -46,7 +47,7 @@ void SdsInit(void)
 bool SdsProcess(uint8_t b)
 {
     switch (state.state) {
-    // wait for HEAD byte
+    // wait for header byte
     case HEAD:
         if (b == MAGIC1) {
             state.state = COMMAND;
@@ -79,6 +80,7 @@ bool SdsProcess(uint8_t b)
             SdsProcess(b);
         }
         break;
+    // wait for tail byte
     case TAIL:
         state.state = HEAD;
         return (b == MAGIC2);
