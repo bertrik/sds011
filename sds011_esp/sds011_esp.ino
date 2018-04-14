@@ -94,8 +94,7 @@ static bool mqtt_send_json(const char *topic, const sds_meas_t *sds)
     strcpy(json, "{");
 
     // dust
-    sprintf(tmp, "\"sds011\":{\"pm10\":%.1f,\"pm2_5\":%.1f}",
-            sds->pm10, sds->pm2_5);
+    sprintf(tmp, "\"sds011\":{\"id\":\"%04X\",\"pm10\":%.1f,\"pm2_5\":%.1f}", sds->id, sds->pm10, sds->pm2_5);
     strcat(json, tmp);
 
     // footer
