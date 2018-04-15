@@ -10,6 +10,6 @@ typedef struct {
 void SdsInit(void);
 bool SdsProcess(uint8_t b);
 void SdsParse(sds_meas_t *meas);
-int SdsCreateCmd(uint8_t *buf, int size, uint8_t cmd, const uint8_t *data, int datalen);
+int SdsCreateCmd(uint8_t *buf, int size, const uint8_t *cmd_data, int cmd_data_len);
 
 

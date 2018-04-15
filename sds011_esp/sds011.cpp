@@ -112,32 +112,37 @@ void SdsParse(sds_meas_t *meas)
 
 /**
     Creates a command buffer to send.
-    @param[in] buf the command buffer
+    @param[out] buf the command buffer
     @param[in] size the size of the command buffer
-    @param[in] cmd the command byte
-    @param[in] data the data byte array
-    @param[in] datalen the length of the byte array
-    @return the length of the command buffer, or 0 if the size was too small
+    @param[in] cmd_data the command data byte array
+    @param[in] cmd_data_len the length of the byte array
+    @return the length of the command buffer, or 0 if no command could be constructed
 */
-int SdsCreateCmd(uint8_t *buf, int size, uint8_t cmd, const uint8_t *data, int datalen)
+int SdsCreateCmd(uint8_t *buf, int size, const uint8_t *cmd_data, int cmd_data_len)
 {
-    if (size < 18) {
+    // verify arguments
+    if (size < 19) {
+        return 0;
+    }
+    if (cmd_data_len > 13) {
         return 0;
     }
 
-    int idx = 0;
-    buf[idx++] = MAGIC1;
-    buf[idx++] = cmd;
-    memcpy(&buf[idx], data, datalen);
-    idx += datalen;
+    // fill buffer
+    memset(buf, 0, size);
+    buf[0] = MAGIC1;
+    buf[1] = 0xB4;
+    memcpy(&buf[2], cmd_data, cmd_data_len);
+    buf[15] = 0xFF;
+    buf[16] = 0xFF;
 
     // calculate check
     uint8_t sum = 0;
-    for (int i = 2; i < idx; i++) {
+    for (int i = 2; i < 17; i++) {
         sum += buf[i];
     }
-    buf[idx++] = sum;
-    buf[idx++] = MAGIC2;
-    return idx;
+    buf[17] = sum;
+    buf[18] = MAGIC2;
+    return 19;
 }
 

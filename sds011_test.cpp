@@ -58,10 +58,10 @@ static bool test_tx(void)
     uint8_t txbuf[32];
 
     // query data command
-    uint8_t cmd_data[15] = {4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF};
+    uint8_t cmd_data[] = {4};
 
     // verify valid message
-    res = SdsCreateCmd(txbuf, sizeof(txbuf), 0xB4, cmd_data, sizeof(cmd_data));
+    res = SdsCreateCmd(txbuf, sizeof(txbuf), cmd_data, sizeof(cmd_data));
     assertEquals(19, res, "sizeof(txbuf)");
 
     const uint8_t expected[] = {0xAA, 0xB4, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0x02, 0xAB};
