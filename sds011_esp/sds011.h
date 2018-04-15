@@ -1,6 +1,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define CMD_SET_DATA_REPORTING_MODE 2
+#define CMD_QUERY_DATA              4
+#define CMD_SET_DEVICE_ID           5
+#define CMD_SET_SLEEP_AND_WORK      6
+#define CMD_CHECK_FIRMWARE_VERSION  7
+#define CMD_SET_WORKING_PERIOD      8
+
 typedef struct {
     float pm2_5;
     float pm10;
