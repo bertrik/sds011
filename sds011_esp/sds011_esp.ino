@@ -105,16 +105,22 @@ void loop(void)
 {
     static sds_meas_t sds_meas;
     static unsigned long last_sent;
+    static boolean have_data = false;
 
     unsigned long ms = millis();
 
     // check measurement interval
     if ((ms - last_sent) > MEASURE_INTERVAL_MS) {
-        // publish it
-        char topic[32];
-        sprintf(topic, "%s/%s", MQTT_TOPIC, esp_id);
-        mqtt_send_json(topic, &sds_meas);
+        if (have_data) {
+            // publish it
+            char topic[32];
+            sprintf(topic, "%s/%s", MQTT_TOPIC, esp_id);
+            mqtt_send_json(topic, &sds_meas);
+        } else {
+            Serial.println("Not publishing, no measurement received from SDS011!");
+        }
         last_sent = ms;
+        have_data = false;
     }
 
     // check for incoming measurement data
@@ -123,6 +129,7 @@ void loop(void)
         if (SdsProcess(c)) {
             // parse it
             SdsParse(&sds_meas);
+            have_data = true;
         }
     }
 }
