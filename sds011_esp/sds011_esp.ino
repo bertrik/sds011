@@ -15,20 +15,19 @@
 // SDS011 pins
 #define PIN_RX  D7
 #define PIN_TX  D8
-#define PIN_RST D3
-#define PIN_SET D4
 
-#define MEASURE_INTERVAL_MS 10000
+#define MEASURE_INTERVAL_MS 30000
 
 #define MQTT_HOST   "aliensdetected.com"
 #define MQTT_PORT   1883
-#define MQTT_TOPIC  "bertrik/sds011"
+#define MQTT_TOPIC  "bertrik/dust"
 
 static SoftwareSerial sensor(PIN_RX, PIN_TX);
 static WiFiClient wifiClient;
 static WiFiManager wifiManager;
 static PubSubClient mqttClient(wifiClient);
 
+static char esp_id[16];
 static char device_name[20];
 
 void setup(void)
@@ -41,7 +40,8 @@ void setup(void)
     Serial.println("SDS011 ESP reader");
 
     // get ESP id
-    sprintf(device_name, "SDS011-%06X", ESP.getChipId());
+    sprintf(esp_id, "%06X", ESP.getChipId());
+    sprintf(device_name, "SDS011-%s", esp_id);
     Serial.print("Device name: ");
     Serial.println(device_name);
 
@@ -52,9 +52,6 @@ void setup(void)
     // initialize the sensor
     sensor.begin(9600);
     SdsInit();
-
-    pinMode(PIN_RST, INPUT_PULLUP);
-    pinMode(PIN_SET, INPUT_PULLUP);
 
     Serial.println("setup() done");
 }
@@ -114,7 +111,9 @@ void loop(void)
     // check measurement interval
     if ((ms - last_sent) > MEASURE_INTERVAL_MS) {
         // publish it
-        mqtt_send_json(MQTT_TOPIC "/json", &sds_meas);
+        char topic[32];
+        sprintf(topic, "%s/%s", MQTT_TOPIC, esp_id);
+        mqtt_send_json(topic, &sds_meas);
         last_sent = ms;
     }
 
