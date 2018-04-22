@@ -91,11 +91,19 @@ bool SdsProcess(uint8_t b)
     return false;
 }
 
-static uint16_t get(const uint8_t *buf, int idx)
+static uint16_t get_le(const uint8_t *buf, int idx)
 {
     uint16_t word;
     word = buf[idx++];
     word += buf[idx++] << 8;
+    return word;
+}
+
+static uint16_t get_be(const uint8_t *buf, int idx)
+{
+    uint16_t word;
+    word = buf[idx++];
+    word = (word << 8) | buf[idx++];
     return word;
 }
 
@@ -105,9 +113,9 @@ static uint16_t get(const uint8_t *buf, int idx)
  */
 void SdsParse(sds_meas_t *meas)
 {
-    meas->pm2_5 = get(state.buf, 0) / 10.0;
-    meas->pm10 = get(state.buf, 2) / 10.0;
-    meas->id = get(state.buf, 4);
+    meas->pm2_5 = get_le(state.buf, 0) / 10.0;
+    meas->pm10 = get_le(state.buf, 2) / 10.0;
+    meas->id = get_be(state.buf, 4);
 }
 
 /**
