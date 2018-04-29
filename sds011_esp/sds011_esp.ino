@@ -32,9 +32,6 @@ static char device_name[20];
 
 void setup(void)
 {
-    uint8_t txbuf[8];
-    int txlen;
-
     // welcome message
     Serial.begin(115200);
     Serial.println("SDS011 ESP reader");
@@ -73,13 +70,6 @@ static bool mqtt_send_string(const char *topic, const char *string)
         Serial.println(result ? "OK" : "FAIL");
     }
     return result;
-}
-
-static bool mqtt_send_value(const char *topic, int value)
-{
-    char string[16];
-    snprintf(string, sizeof(string), "%d", value);
-    return mqtt_send_string(topic, string);
 }
 
 static bool mqtt_send_json(const char *topic, const sds_meas_t *sds)
