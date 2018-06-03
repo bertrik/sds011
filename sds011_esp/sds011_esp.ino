@@ -72,7 +72,7 @@ static bool mqtt_send_string(const char *topic, const char *string)
     return result;
 }
 
-static bool mqtt_send_json(const char *topic, const sds_meas_t *sds)
+static bool mqtt_send_json(const char *topic, int alive, const sds_meas_t *sds)
 {
     static char json[128];
     char tmp[128];
@@ -80,8 +80,12 @@ static bool mqtt_send_json(const char *topic, const sds_meas_t *sds)
     // header
     strcpy(json, "{");
 
+    // alive
+    sprintf(tmp, "\"alive\":%d", alive);
+    strcat(json, tmp);
+
     // dust
-    sprintf(tmp, "\"SDS011\":{\"id\":\"%04X\",\"PM10\":%.1f,\"PM2.5\":%.1f}", sds->id, sds->pm10, sds->pm2_5);
+    sprintf(tmp, ",\"SDS011\":{\"id\":\"%04X\",\"PM10\":%.1f,\"PM2.5\":%.1f}", sds->id, sds->pm10, sds->pm2_5);
     strcat(json, tmp);
 
     // footer
@@ -96,6 +100,7 @@ void loop(void)
     static sds_meas_t sds_meas;
     static unsigned long last_sent;
     static boolean have_data = false;
+    static int alive_count = 0;
 
     unsigned long ms = millis();
 
@@ -105,7 +110,8 @@ void loop(void)
             // publish it
             char topic[32];
             sprintf(topic, "%s/%s", MQTT_TOPIC, esp_id);
-            mqtt_send_json(topic, &sds_meas);
+            alive_count++;
+            mqtt_send_json(topic, alive_count, &sds_meas);
         } else {
             Serial.println("Not publishing, no measurement received from SDS011!");
         }
