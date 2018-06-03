@@ -74,7 +74,7 @@ static bool mqtt_send_string(const char *topic, const char *string)
 
 static bool mqtt_send_json(const char *topic, int alive, const sds_meas_t *sds)
 {
-    static char json[128];
+    static char json[256];
     char tmp[128];
 
     // header
